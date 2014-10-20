@@ -7,33 +7,39 @@ from icalendar import Calendar, Event
 OFF, EARLY, LATE, NIGHT = (0, 1, 2, 3)
 
 
-def get_ical(start_date, shifts):
-    cal = Calendar()
-    adate = start_date
-    for shift in shifts:
-        event = Event()
-        if shift == EARLY:
-            event['dtstart'] = adate.strftime('%Y%m%dT080000')
-            event['dtend'] = adate.strftime('%Y%m%dT160000')
-        elif shift == LATE:
-            event['dtstart'] = adate.strftime('%Y%m%dT113000')
-            event['dtend'] = adate.strftime('%Y%m%dT200000')
-        elif shift == NIGHT:
-            event['dtstart'] = adate.strftime('%Y%m%dT203000')
-            event['dtend'] = (adate + timedelta(1)).strftime('%Y%m%dT074500')
-        elif shift != OFF:
-            print('Unknown shift: {}'.format(shift))
-            shift = OFF
-        if shift != OFF:
-            cal.add_component(event)
-        adate += timedelta(1)
-    return cal.to_ical()
+class ShiftCal(object):
+    def __init__(self, start_date, shifts):
+        self.start_date = start_date
+        self.shifts = shifts
+
+    def get_ical(self):
+        cal = Calendar()
+        adate = self.start_date
+        for shift in self.shifts:
+            event = Event()
+            if shift == EARLY:
+                event['dtstart'] = adate.strftime('%Y%m%dT080000')
+                event['dtend'] = adate.strftime('%Y%m%dT160000')
+            elif shift == LATE:
+                event['dtstart'] = adate.strftime('%Y%m%dT113000')
+                event['dtend'] = adate.strftime('%Y%m%dT200000')
+            elif shift == NIGHT:
+                event['dtstart'] = adate.strftime('%Y%m%dT203000')
+                event['dtend'] = (adate + timedelta(1)).strftime('%Y%m%dT074500')
+            elif shift != OFF:
+                print('Unknown shift: {}'.format(shift))
+                shift = OFF
+            if shift != OFF:
+                cal.add_component(event)
+            adate += timedelta(1)
+        return cal.to_ical()
 
 
 class TestShiftcal(unittest.TestCase):
     def test_single_date_late_shift(self):
         adate = date(2014, 1, 1)
-        ical = get_ical(adate, [LATE])
+        shiftcal = ShiftCal(adate, [LATE])
+        ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),
             """BEGIN:VCALENDAR
@@ -45,7 +51,8 @@ END:VCALENDAR""")
 
     def test_single_date_early_shift(self):
         adate = date(2014, 1, 1)
-        ical = get_ical(adate, [EARLY])
+        shiftcal = ShiftCal(adate, [EARLY])
+        ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),
             """BEGIN:VCALENDAR
@@ -57,7 +64,8 @@ END:VCALENDAR""")
 
     def test_single_date_night_shift(self):
         adate = date(2014, 1, 1)
-        ical = get_ical(adate, [NIGHT])
+        shiftcal = ShiftCal(adate, [NIGHT])
+        ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),
             """BEGIN:VCALENDAR
@@ -69,7 +77,8 @@ END:VCALENDAR""")
 
     def test_single_date_off(self):
         adate = date(2014, 1, 1)
-        ical = get_ical(adate, [OFF])
+        shiftcal = ShiftCal(adate, [OFF])
+        ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),
             """BEGIN:VCALENDAR
@@ -77,7 +86,8 @@ END:VCALENDAR""")
 
     def test_two_early_shifts(self):
         adate = date(2014, 1, 1)
-        ical = get_ical(adate, [EARLY, EARLY])
+        shiftcal = ShiftCal(adate, [EARLY, EARLY])
+        ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),
             """BEGIN:VCALENDAR
@@ -93,9 +103,10 @@ END:VCALENDAR""")
 
     def test_realistic_shifts(self):
         adate = date(2014, 7, 28)
-        ical = get_ical(
+        shiftcal = ShiftCal(
             adate,
             [EARLY, EARLY, OFF, OFF, LATE, EARLY, EARLY, LATE])
+        ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),
             """BEGIN:VCALENDAR
