@@ -4,12 +4,13 @@ from datetime import timedelta
 from icalendar import Calendar, Event
 
 
-OFF, EARLY, LATE, NIGHT = (0, 1, 2, 3)
+OFF, EARLY, LATE, NIGHT, DOUBLE = (0, 1, 2, 3, 4)
 DEFAULT_DEFINITIONS = {
     OFF: None,
     EARLY: ['080000', '160000'],
     LATE: ['113000', '200000'],
     NIGHT: ['203000', '074500'],
+    DOUBLE: ['080000', '200000'],
 }
 
 
@@ -81,6 +82,19 @@ END:VCALENDAR""")
 BEGIN:VEVENT
 DTSTART:20140101T203000
 DTEND:20140102T074500
+END:VEVENT
+END:VCALENDAR""")
+
+    def test_single_date_double_shift(self):
+        adate = date(2014, 1, 1)
+        shiftcal = ShiftCal(adate, [DOUBLE])
+        ical = shiftcal.get_ical()
+        self.assertEqual(
+            ical.replace('\r\n', '\n').strip(),
+            """BEGIN:VCALENDAR
+BEGIN:VEVENT
+DTSTART:20140101T080000
+DTEND:20140101T200000
 END:VEVENT
 END:VCALENDAR""")
 
