@@ -123,6 +123,25 @@ DTEND:20140804T200000
 END:VEVENT
 END:VCALENDAR""")
 
+    def test_shifts_string(self):
+        adate = date(2014, 7, 28)
+        shiftcal = ShiftCal(
+            adate,
+            'EOL')
+        ical = shiftcal.get_ical()
+        self.assertEqual(
+            ical.replace('\r\n', '\n').strip(),
+            """BEGIN:VCALENDAR
+BEGIN:VEVENT
+DTSTART:20140728T080000
+DTEND:20140728T160000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20140730T113000
+DTEND:20140730T200000
+END:VEVENT
+END:VCALENDAR""")
+
 if __name__ == '__main__':
     unittest.main()
 

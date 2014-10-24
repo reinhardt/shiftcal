@@ -2,7 +2,7 @@ from datetime import timedelta
 from icalendar import Calendar, Event
 
 
-OFF, EARLY, LATE, NIGHT, DOUBLE = (0, 1, 2, 3, 4)
+OFF, EARLY, LATE, NIGHT, DOUBLE = ('O', 'E', 'L', 'N', 'D')
 DEFAULT_DEFINITIONS = {
     OFF: None,
     EARLY: ['080000', '160000'],
