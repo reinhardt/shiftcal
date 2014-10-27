@@ -1,3 +1,7 @@
+import argparse
+import re
+from datetime import date
+from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar, Event
 
@@ -41,3 +45,34 @@ class ShiftCal(object):
                 cal.add_component(event)
             adate += timedelta(1)
         return cal.to_ical()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='Generate ical shift calendars')
+    parser.add_argument(
+        '--startdate',
+        type=str,
+        help='the start date for the shift plan, in format YYYYMMDD'
+        ' or as an offset in days from today, e.g. -1 for yesterday')
+    parser.add_argument(
+        'shifts',
+        type=str,
+        help='a string describing the shift plan, e.g. EENDNOL')
+    args = parser.parse_args()
+
+    start_date = today = date.today()
+    if args.startdate:
+        if args.startdate == 'today':
+            start_date = today
+        elif re.match(r'[+-][0-9]*$', args.startdate):
+            start_date = today + timedelta(int(args.startdate))
+        elif re.match(r'[0-9]{8}$', args.startdate):
+            start_date = datetime.strptime(args.startdate, '%Y%m%d')
+        else:
+            print('error: unrecognized startdate format: {0}'.format(
+                args.startdate))
+            exit(1)
+
+    shiftcal = ShiftCal(start_date, args.shifts)
+    print(shiftcal.get_ical())
