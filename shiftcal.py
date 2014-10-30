@@ -1,19 +1,36 @@
 import argparse
+import os
 import re
+from ConfigParser import SafeConfigParser
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar, Event
 
 
+def pad_time(timestr):
+    if len(timestr) == 4:
+        timestr += '00'
+    return timestr
+
+
+def get_definitions(config):
+    shifts = config.get('shiftcal', 'shifts').split(',')
+    shiftdata = {}
+    for shift in shifts:
+        shift = shift.strip()
+        token = config.get(shift, 'token')
+        start = pad_time(config.get(shift, 'start'))
+        end = pad_time(config.get(shift, 'end'))
+        shiftdata[token] = [start, end]
+    return shiftdata
+
+
 OFF, EARLY, LATE, NIGHT, DOUBLE = ('O', 'E', 'L', 'N', 'D')
-DEFAULT_DEFINITIONS = {
-    OFF: None,
-    EARLY: ['080000', '160000'],
-    LATE: ['113000', '200000'],
-    NIGHT: ['203000', '074500'],
-    DOUBLE: ['080000', '200000'],
-}
+default_config = SafeConfigParser()
+default_config.read('shiftcal_defaults.cfg')
+DEFAULT_DEFINITIONS = get_definitions(default_config)
+DEFAULT_DEFINITIONS[OFF] = None
 
 
 class ShiftCal(object):
@@ -47,24 +64,6 @@ class ShiftCal(object):
         return cal.to_ical()
 
 
-def pad_time(timestr):
-    if len(timestr) == 4:
-        timestr += '00'
-    return timestr
-
-
-def get_definitions(config):
-    shifts = config.get('shiftcal', 'shifts').split(',')
-    shiftdata = {}
-    for shift in shifts:
-        shift = shift.strip()
-        token = config.get(shift, 'token')
-        start = pad_time(config.get(shift, 'start'))
-        end = pad_time(config.get(shift, 'end'))
-        shiftdata[token] = [start, end]
-    return shiftdata
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Generate ical shift calendars')
@@ -79,6 +78,12 @@ if __name__ == "__main__":
         help='a string describing the shift plan, e.g. EENDNOL')
     args = parser.parse_args()
 
+    definitions = None
+    if os.path.exists('shiftcal.cfg'):
+        config = SafeConfigParser()
+        config.read('shiftcal.cfg')
+        definitions = get_definitions(config)
+
     start_date = today = date.today()
     if args.startdate:
         if args.startdate == 'today':
@@ -92,5 +97,5 @@ if __name__ == "__main__":
                 args.startdate))
             exit(1)
 
-    shiftcal = ShiftCal(start_date, args.shifts)
+    shiftcal = ShiftCal(start_date, args.shifts, definitions=definitions)
     print(shiftcal.get_ical())
