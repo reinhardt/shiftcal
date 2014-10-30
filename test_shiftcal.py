@@ -234,5 +234,19 @@ end = 0745"""
         self.assertEqual(definitions['N']['start'], '203000')
         self.assertEqual(definitions['N']['end'], '074500')
 
+    def test_off(self):
+        config = u"""[shiftcal]
+shifts = off
+
+[off]
+token = O"""
+        config_parser = SafeConfigParser()
+        config_parser.readfp(StringIO(unicode(config)))
+        definitions = get_definitions(config_parser)
+        self.assertIn('O', definitions)
+        self.assertNotIn('start', definitions['O'])
+        self.assertNotIn('end', definitions['O'])
+
+
 if __name__ == '__main__':
     unittest.main()

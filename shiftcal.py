@@ -20,12 +20,15 @@ def get_definitions(config):
     for shift in shifts:
         shift = shift.strip()
         token = config.get(shift, 'token')
-        start = pad_time(config.get(shift, 'start'))
-        end = pad_time(config.get(shift, 'end'))
-        shiftdata[token] = {
-            'start': start,
-            'end': end,
-        }
+        shiftdata[token] = {}
+        if (config.has_option(shift, 'start') and
+                config.has_option(shift, 'end')):
+            start = pad_time(config.get(shift, 'start'))
+            end = pad_time(config.get(shift, 'end'))
+            shiftdata[token].update({
+                'start': start,
+                'end': end,
+            })
         if config.has_option(shift, 'title'):
             shiftdata[token]['title'] = config.get(shift, 'title')
     return shiftdata
