@@ -22,7 +22,12 @@ def get_definitions(config):
         token = config.get(shift, 'token')
         start = pad_time(config.get(shift, 'start'))
         end = pad_time(config.get(shift, 'end'))
-        shiftdata[token] = [start, end]
+        shiftdata[token] = {
+            'start': start,
+            'end': end,
+        }
+        if config.has_option(shift, 'title'):
+            shiftdata[token]['title'] = config.get(shift, 'title')
     return shiftdata
 
 
@@ -48,7 +53,11 @@ class ShiftCal(object):
                 print('Unknown shift: {}'.format(shift))
                 times = None
             else:
-                times = self.definitions[shift]
+                if self.definitions[shift]:
+                    times = [self.definitions[shift]['start'],
+                             self.definitions[shift]['end']]
+                else:
+                    times = None
             if times is not None:
                 event['dtstart'] = adate.strftime(
                     '%Y%m%dT{0}'.format(times[0]))
@@ -58,6 +67,8 @@ class ShiftCal(object):
                     enddate = adate
                 event['dtend'] = enddate.strftime(
                     '%Y%m%dT{0}'.format(times[1]))
+                if 'title' in self.definitions[shift]:
+                    event['summary'] = self.definitions[shift]['title']
 
                 cal.add_component(event)
             adate += timedelta(1)

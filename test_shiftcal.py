@@ -4,6 +4,7 @@ from datetime import date
 from io import StringIO
 
 from shiftcal import ShiftCal
+from shiftcal import DEFAULT_DEFINITIONS
 from shiftcal import OFF
 from shiftcal import EARLY
 from shiftcal import LATE
@@ -21,6 +22,22 @@ class TestShiftcal(unittest.TestCase):
             ical.replace('\r\n', '\n').strip(),
             """BEGIN:VCALENDAR
 BEGIN:VEVENT
+DTSTART:20140101T113000
+DTEND:20140101T200000
+END:VEVENT
+END:VCALENDAR""")
+
+    def test_single_date_late_shift_with_title(self):
+        definitions = DEFAULT_DEFINITIONS.copy()
+        definitions['L']['title'] = 'Late'
+        adate = date(2014, 1, 1)
+        shiftcal = ShiftCal(adate, [LATE])
+        ical = shiftcal.get_ical()
+        self.assertEqual(
+            ical.replace('\r\n', '\n').strip(),
+            """BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY:Late
 DTSTART:20140101T113000
 DTEND:20140101T200000
 END:VEVENT
@@ -159,8 +176,25 @@ end = 1530"""
         config_parser.readfp(StringIO(unicode(config)))
         definitions = get_definitions(config_parser)
         self.assertIn('E', definitions)
-        self.assertEqual(definitions['E'][0], '073000')
-        self.assertEqual(definitions['E'][1], '153000')
+        self.assertEqual(definitions['E']['start'], '073000')
+        self.assertEqual(definitions['E']['end'], '153000')
+
+    def test_early_shift_with_title(self):
+        config = u"""[shiftcal]
+shifts = early
+
+[early]
+token = E
+title = Early
+start = 0730
+end = 1530"""
+        config_parser = SafeConfigParser()
+        config_parser.readfp(StringIO(unicode(config)))
+        definitions = get_definitions(config_parser)
+        self.assertIn('E', definitions)
+        self.assertEqual(definitions['E']['start'], '073000')
+        self.assertEqual(definitions['E']['end'], '153000')
+        self.assertEqual(definitions['E']['title'], 'Early')
 
     def test_late_shift(self):
         config = u"""[shiftcal]
@@ -174,8 +208,8 @@ end = 2100"""
         config_parser.readfp(StringIO(unicode(config)))
         definitions = get_definitions(config_parser)
         self.assertIn('L', definitions)
-        self.assertEqual(definitions['L'][0], '130000')
-        self.assertEqual(definitions['L'][1], '210000')
+        self.assertEqual(definitions['L']['start'], '130000')
+        self.assertEqual(definitions['L']['end'], '210000')
 
     def test_early_and_night_shift(self):
         config = u"""[shiftcal]
@@ -194,11 +228,11 @@ end = 0745"""
         config_parser.readfp(StringIO(unicode(config)))
         definitions = get_definitions(config_parser)
         self.assertIn('E', definitions)
-        self.assertEqual(definitions['E'][0], '073000')
-        self.assertEqual(definitions['E'][1], '153000')
+        self.assertEqual(definitions['E']['start'], '073000')
+        self.assertEqual(definitions['E']['end'], '153000')
         self.assertIn('N', definitions)
-        self.assertEqual(definitions['N'][0], '203000')
-        self.assertEqual(definitions['N'][1], '074500')
+        self.assertEqual(definitions['N']['start'], '203000')
+        self.assertEqual(definitions['N']['end'], '074500')
 
 if __name__ == '__main__':
     unittest.main()
