@@ -47,6 +47,24 @@ class ShiftCal(object):
         return cal.to_ical()
 
 
+def pad_time(timestr):
+    if len(timestr) == 4:
+        timestr += '00'
+    return timestr
+
+
+def get_definitions(config):
+    shifts = config.get('shiftcal', 'shifts').split(',')
+    shiftdata = {}
+    for shift in shifts:
+        shift = shift.strip()
+        token = config.get(shift, 'token')
+        start = pad_time(config.get(shift, 'start'))
+        end = pad_time(config.get(shift, 'end'))
+        shiftdata[token] = [start, end]
+    return shiftdata
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Generate ical shift calendars')

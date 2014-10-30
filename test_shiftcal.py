@@ -1,5 +1,7 @@
 import unittest2 as unittest
+from ConfigParser import SafeConfigParser
 from datetime import date
+from io import StringIO
 
 from shiftcal import ShiftCal
 from shiftcal import OFF
@@ -7,6 +9,7 @@ from shiftcal import EARLY
 from shiftcal import LATE
 from shiftcal import NIGHT
 from shiftcal import DOUBLE
+from shiftcal import get_definitions
 
 
 class TestShiftcal(unittest.TestCase):
@@ -142,6 +145,60 @@ DTEND:20140730T200000
 END:VEVENT
 END:VCALENDAR""")
 
+
+class TestConfig(unittest.TestCase):
+    def test_early_shift(self):
+        config = u"""[shiftcal]
+shifts = early
+
+[early]
+token = E
+start = 0730
+end = 1530"""
+        config_parser = SafeConfigParser()
+        config_parser.readfp(StringIO(unicode(config)))
+        definitions = get_definitions(config_parser)
+        self.assertIn('E', definitions)
+        self.assertEqual(definitions['E'][0], '073000')
+        self.assertEqual(definitions['E'][1], '153000')
+
+    def test_late_shift(self):
+        config = u"""[shiftcal]
+shifts = late
+
+[late]
+token = L
+start = 1300
+end = 2100"""
+        config_parser = SafeConfigParser()
+        config_parser.readfp(StringIO(unicode(config)))
+        definitions = get_definitions(config_parser)
+        self.assertIn('L', definitions)
+        self.assertEqual(definitions['L'][0], '130000')
+        self.assertEqual(definitions['L'][1], '210000')
+
+    def test_early_and_night_shift(self):
+        config = u"""[shiftcal]
+shifts = early, night
+
+[early]
+token = E
+start = 0730
+end = 1530
+
+[night]
+token = N
+start = 2030
+end = 0745"""
+        config_parser = SafeConfigParser()
+        config_parser.readfp(StringIO(unicode(config)))
+        definitions = get_definitions(config_parser)
+        self.assertIn('E', definitions)
+        self.assertEqual(definitions['E'][0], '073000')
+        self.assertEqual(definitions['E'][1], '153000')
+        self.assertIn('N', definitions)
+        self.assertEqual(definitions['N'][0], '203000')
+        self.assertEqual(definitions['N'][1], '074500')
+
 if __name__ == '__main__':
     unittest.main()
-
