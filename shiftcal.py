@@ -4,6 +4,7 @@ import re
 from ConfigParser import SafeConfigParser
 from datetime import date
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from icalendar import Calendar, Event
 
@@ -42,10 +43,11 @@ DEFAULT_DEFINITIONS[OFF] = None
 
 
 class ShiftCal(object):
-    def __init__(self, start_date, shifts, definitions=[]):
+    def __init__(self, start_date, shifts, definitions=[], timezone=None):
         self.start_date = start_date
         self.shifts = shifts
         self.definitions = definitions or DEFAULT_DEFINITIONS
+        self.timezone = timezone
 
     def get_ical(self):
         cal = Calendar()
@@ -62,14 +64,14 @@ class ShiftCal(object):
                 else:
                     times = None
             if times is not None:
-                event['dtstart'] = adate.strftime(
-                    '%Y%m%dT{0}'.format(times[0]))
+                starttime = time(int(times[0][:2]), int(times[0][2:4]))
+                event.add('dtstart', datetime.combine(adate, starttime))
                 if int(times[0]) > int(times[1]):
                     enddate = adate + timedelta(1)
                 else:
                     enddate = adate
-                event['dtend'] = enddate.strftime(
-                    '%Y%m%dT{0}'.format(times[1]))
+                endtime = time(int(times[1][:2]), int(times[1][2:4]))
+                event.add('dtend',datetime.combine(enddate, endtime))
                 if 'title' in self.definitions[shift]:
                     event['summary'] = self.definitions[shift]['title']
 
