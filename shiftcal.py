@@ -1,5 +1,6 @@
 import argparse
 import os
+import pytz
 import re
 from ConfigParser import SafeConfigParser
 from datetime import date
@@ -91,6 +92,10 @@ if __name__ == "__main__":
         help='the start date for the shift plan, in format YYYYMMDD'
         ' or as an offset in days from today, e.g. -1 for yesterday')
     parser.add_argument(
+        '--timezone',
+        type=str,
+        help='a string representation of the time zone to use')
+    parser.add_argument(
         'shifts',
         type=str,
         help='a string describing the shift plan, e.g. EENDNOL')
@@ -115,5 +120,11 @@ if __name__ == "__main__":
                 args.startdate))
             exit(1)
 
-    shiftcal = ShiftCal(start_date, args.shifts, definitions=definitions)
+    if args.timezone:
+        timezone = pytz.timezone(args.timezone)
+    else:
+        timezone = None
+
+    shiftcal = ShiftCal(start_date, args.shifts, definitions=definitions,
+                        timezone=timezone)
     print(shiftcal.get_ical())
