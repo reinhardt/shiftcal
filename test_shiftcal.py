@@ -5,12 +5,12 @@ from io import StringIO
 import pytz
 
 from shiftcal import ShiftCal
-from shiftcal import DEFAULT_DEFINITIONS
 from shiftcal import OFF
 from shiftcal import EARLY
 from shiftcal import LATE
 from shiftcal import NIGHT
 from shiftcal import DOUBLE
+from shiftcal import default_config
 from shiftcal import get_definitions
 
 
@@ -29,10 +29,10 @@ END:VEVENT
 END:VCALENDAR""")
 
     def test_single_date_late_shift_with_title(self):
-        definitions = DEFAULT_DEFINITIONS.copy()
+        definitions = get_definitions(default_config)
         definitions['L']['title'] = 'Late'
         adate = date(2014, 1, 1)
-        shiftcal = ShiftCal(adate, [LATE])
+        shiftcal = ShiftCal(adate, [LATE], definitions=definitions)
         ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),
@@ -163,10 +163,10 @@ DTEND;VALUE=DATE-TIME:20140730T200000
 END:VEVENT
 END:VCALENDAR""")
 
-    @unittest.skip("not implemented")
     def test_timezone(self):
         adate = date(2014, 1, 1)
-        shiftcal = ShiftCal(adate, [LATE], timezone=pytz.timezone("Europe/Berlin"))
+        shiftcal = ShiftCal(adate, [LATE],
+                            timezone=pytz.timezone("Europe/Berlin"))
         ical = shiftcal.get_ical()
         self.assertEqual(
             ical.replace('\r\n', '\n').strip(),

@@ -64,14 +64,16 @@ class ShiftCal(object):
                 else:
                     times = None
             if times is not None:
-                starttime = time(int(times[0][:2]), int(times[0][2:4]))
+                starttime = time(int(times[0][:2]), int(times[0][2:4]),
+                                 tzinfo=self.timezone)
                 event.add('dtstart', datetime.combine(adate, starttime))
                 if int(times[0]) > int(times[1]):
                     enddate = adate + timedelta(1)
                 else:
                     enddate = adate
-                endtime = time(int(times[1][:2]), int(times[1][2:4]))
-                event.add('dtend',datetime.combine(enddate, endtime))
+                endtime = time(int(times[1][:2]), int(times[1][2:4]),
+                               tzinfo=self.timezone)
+                event.add('dtend', datetime.combine(enddate, endtime))
                 if 'title' in self.definitions[shift]:
                     event['summary'] = self.definitions[shift]['title']
 
