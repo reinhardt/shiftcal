@@ -1,0 +1,60 @@
+<!doctype html>
+<link rel="stylesheet" href="static/widgets.min.css" type="text/css" >
+<script type="text/javascript" src="static/js/widgets.min.js"></script>
+<script>
+    window.DEBUG = true;
+    require(["mockup-bundles-widgets"]);
+</script>
+<style>
+fieldset.date {
+    float: left;
+}
+ul {
+    list-style: outside none none;
+    padding: 0.1em;
+}
+</style>
+<form action="/" id="shiftcal" method="get" class="pat-autosubmit">
+    <fieldset>
+        <label>Start date
+            <input name="start_date" class="pat-pickadate" value="{{ start_date }}" data-pat-pickadate="time:false"/></label>
+        <input type="hidden" name="num_dates" value="{{ num_dates }}">
+        <input type="submit" name="update" value="Refresh">
+        <input type="submit" name="more" value="More Dates">
+    </fieldset>
+</form>
+<form action="/shiftcal.ics" id="shiftcal" method="get">
+    <fieldset>
+        <input name="start_date" type="hidden" value="{{ start_date }}"/>
+        {% for row in dates|batch(7) %}
+        {% set row_index = loop.index %}
+        <div>
+            {% for date in row %}
+            {% set date_index = "%02d%02d"|format(row_index, loop.index) %}
+            <fieldset class="date">
+                {{ date.strftime('%a, %Y-%m-%d') }}
+                <ul>
+                    {% for shift in shifts %}
+                    <li>
+                        <input type="radio" name="shift-{{ date_index }}" value="{{ shift.token }}" {{ shift.checked }}><label for="shift-{{ date_index }}">{{ shift.title }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </fieldset>
+    <fieldset>
+        <input type="submit" name="submit" value="Submit">
+    </fieldset>
+</form>
+{% if False %}
+<label>Shifts
+    <input type="text" class="pat-select2"
+           data-pat-select2="orderable:true;
+                             tags:{{ shifts }};
+                             width:20em;
+                             multiple:true" />
+</label>
+{% endif %}
