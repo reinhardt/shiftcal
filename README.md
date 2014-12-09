@@ -16,6 +16,10 @@ This generates an ical file test.ics containing three consecutive days of early 
 
 The format for the start date is YYYYMMDD (four digits for the year, then two difits each for month and day).
 
+There is also a flask app. If you have installed flask you can run it with
+
+    $ python webapp.py
+
 Configuration
 -------------
 

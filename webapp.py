@@ -35,7 +35,7 @@ def root():
          'title': definitions[d].get('title', d).decode('utf-8'),
          'checked': ''}
         for d in definitions]
-    shifts[0]['checked'] = 'checked'
+    shifts[0]['checked'] = 'checked="checked"'
     num_dates = 7
     if 'num_dates' in query:
         num_dates = int(query['num_dates'])
