@@ -20,7 +20,11 @@ ul {
             <input name="start_date" class="pat-pickadate" value="{{ start_date }}" data-pat-pickadate="time:false"/></label>
         <input type="hidden" name="num_dates" value="{{ num_dates }}">
         <input type="submit" name="update" value="Refresh">
+    </fieldset>
+    <fieldset>
+        <input type="text" name="num_more_dates" value="{{ num_more_dates }}" />
         <input type="submit" name="more" value="More Dates">
+        <input type="submit" name="less" value="Less Dates">
     </fieldset>
 </form>
 <form action="/shiftcal.ics" id="shiftcal" method="get">

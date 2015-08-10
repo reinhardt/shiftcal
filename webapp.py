@@ -36,15 +36,20 @@ def root():
          'checked': ''}
         for d in definitions]
     shifts[0]['checked'] = 'checked="checked"'
-    num_dates = 7
+    num_dates = int(query.get('num_dates', 7))
+    num_more_dates = int(query.get('num_more_dates', 7))
     if 'num_dates' in query:
-        num_dates = int(query['num_dates'])
         if 'more' in query:
-            num_dates += 7
+            num_dates += num_more_dates
+        if 'less' in query:
+            num_dates -= num_more_dates
+            if num_dates < 0:
+                num_dates = 1
     dates = [start_date + timedelta(days) for days in range(num_dates)]
     return render_template(
         'shiftcal.html',
-        shifts=shifts, start_date=start_date, dates=dates, num_dates=num_dates)
+        shifts=shifts, start_date=start_date, dates=dates, num_dates=num_dates,
+        num_more_dates=num_more_dates)
 
 
 @app.route("/shiftcal.ics")
