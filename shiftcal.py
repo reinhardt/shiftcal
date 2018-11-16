@@ -1,7 +1,9 @@
+from __future__ import print_function
 import argparse
 import os
 import pytz
 import re
+import sys
 from ConfigParser import SafeConfigParser
 from datetime import date
 from datetime import datetime
@@ -56,7 +58,8 @@ class ShiftCal(object):
         for shift in self.shifts:
             event = Event()
             if shift not in self.definitions:
-                print('Unknown shift: {}'.format(shift))
+                print('WARNING: Unknown shift: {}'.format(shift),
+                      file=sys.stderr)
                 times = None
             else:
                 if self.definitions[shift]:
@@ -116,8 +119,8 @@ if __name__ == "__main__":
         elif re.match(r'[0-9]{8}$', args.startdate):
             start_date = datetime.strptime(args.startdate, '%Y%m%d')
         else:
-            print('error: unrecognized startdate format: {0}'.format(
-                args.startdate))
+            print('ERROR: unrecognized startdate format: {0}'.format(
+                args.startdate), file=sys.stderr)
             exit(1)
 
     if args.timezone:
