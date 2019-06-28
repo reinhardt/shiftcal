@@ -118,6 +118,8 @@ if __name__ == "__main__":
             start_date = today + timedelta(int(args.startdate))
         elif re.match(r'[0-9]{8}$', args.startdate):
             start_date = datetime.strptime(args.startdate, '%Y%m%d')
+        elif re.match(r'[0-9]{4}-[0-9]{2}-[0-9]{2}$', args.startdate):
+            start_date = datetime.strptime(args.startdate, '%Y-%m-%d')
         else:
             print('ERROR: unrecognized startdate format: {0}'.format(
                 args.startdate), file=sys.stderr)
