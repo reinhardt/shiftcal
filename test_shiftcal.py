@@ -1,5 +1,5 @@
-import unittest2 as unittest
-from ConfigParser import SafeConfigParser
+import unittest
+from configparser import ConfigParser
 from datetime import date
 from io import StringIO
 import pytz
@@ -187,8 +187,8 @@ shifts = early
 token = E
 start = 0730
 end = 1530"""
-        config_parser = SafeConfigParser()
-        config_parser.readfp(StringIO(unicode(config)))
+        config_parser = ConfigParser()
+        config_parser.read_file(StringIO(config))
         definitions = get_definitions(config_parser)
         self.assertIn('E', definitions)
         self.assertEqual(definitions['E']['start'], '073000')
@@ -203,8 +203,8 @@ token = E
 title = Early
 start = 0730
 end = 1530"""
-        config_parser = SafeConfigParser()
-        config_parser.readfp(StringIO(unicode(config)))
+        config_parser = ConfigParser()
+        config_parser.read_file(StringIO(config))
         definitions = get_definitions(config_parser)
         self.assertIn('E', definitions)
         self.assertEqual(definitions['E']['start'], '073000')
@@ -219,8 +219,8 @@ shifts = late
 token = L
 start = 1300
 end = 2100"""
-        config_parser = SafeConfigParser()
-        config_parser.readfp(StringIO(unicode(config)))
+        config_parser = ConfigParser()
+        config_parser.read_file(StringIO(config))
         definitions = get_definitions(config_parser)
         self.assertIn('L', definitions)
         self.assertEqual(definitions['L']['start'], '130000')
@@ -239,8 +239,8 @@ end = 1530
 token = N
 start = 2030
 end = 0745"""
-        config_parser = SafeConfigParser()
-        config_parser.readfp(StringIO(unicode(config)))
+        config_parser = ConfigParser()
+        config_parser.read_file(StringIO(config))
         definitions = get_definitions(config_parser)
         self.assertIn('E', definitions)
         self.assertEqual(definitions['E']['start'], '073000')
@@ -255,8 +255,8 @@ shifts = off
 
 [off]
 token = O"""
-        config_parser = SafeConfigParser()
-        config_parser.readfp(StringIO(unicode(config)))
+        config_parser = ConfigParser()
+        config_parser.read_file(StringIO(config))
         definitions = get_definitions(config_parser)
         self.assertIn('O', definitions)
         self.assertNotIn('start', definitions['O'])
